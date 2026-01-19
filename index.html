@@ -6,30 +6,20 @@
     <title>어진반 한글 놀이터</title>
     <script src="https://unpkg.com/hangul-js"></script>
     <style>
-        /* 유아들이 좋아하는 밝고 따뜻한 색감 적용 */
-        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; text-align: center; background-color: #FFFDE7; margin: 0; padding: 20px; touch-action: manipulation; }
-        
-        /* 전자칠판에서도 잘 보이도록 크고 선명한 전광판 */
+        body { font-family: 'Apple SD Gothic Neo', sans-serif; text-align: center; background-color: #FFFDE7; margin: 0; padding: 20px; touch-action: manipulation; }
         #display { font-size: 100px; min-height: 150px; background: white; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; box-shadow: 0 10px 0 #FFD54F; border: 6px solid #FFC107; padding: 20px; color: #333; font-weight: bold; }
-        
         .section-label { font-size: 22px; font-weight: bold; color: #555; margin-bottom: 10px; text-align: left; padding-left: 15px; }
         .group { margin-bottom: 25px; padding: 20px; background: rgba(255,255,255,0.8); border-radius: 30px; box-shadow: 0 5px 0 #eee; }
-        
-        /* 터치하기 편한 큼직한 버튼 디자인 */
         .btn { display: inline-block; width: 80px; height: 80px; line-height: 80px; margin: 6px; font-size: 32px; font-weight: bold; background: #fff; border: 4px solid #eee; border-radius: 20px; cursor: pointer; transition: 0.1s; user-select: none; box-shadow: 0 6px 0 #eee; }
         .btn:active { transform: translateY(6px); box-shadow: none; }
-        
-        /* 가독성을 높이기 위한 영역별 색상 구분 */
-        .consonant { border-color: #64B5F6; color: #1976D2; box-shadow: 0 6px 0 #64B5F6; } /* 자음: 시원한 파랑 */
-        .vowel { border-color: #FF8A65; color: #E64A19; box-shadow: 0 6px 0 #FF8A65; } /* 모음: 따뜻한 주황 */
-        .double { border-color: #BA68C8; color: #7B1FA2; box-shadow: 0 6px 0 #BA68C8; } /* 쌍자음/겹받침: 예쁜 보라 */
-        
-        /* 기능 버튼: 크고 명확하게 */
+        .consonant { border-color: #64B5F6; color: #1976D2; box-shadow: 0 6px 0 #64B5F6; } 
+        .vowel { border-color: #FF8A65; color: #E64A19; box-shadow: 0 6px 0 #FF8A65; } 
+        .double { border-color: #BA68C8; color: #7B1FA2; box-shadow: 0 6px 0 #BA68C8; } 
         .control-panel { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
-        .control { padding: 25px 40px; font-size: 28px; font-weight: bold; border-radius: 30px; border: none; cursor: pointer; color: white; flex: 1; max-width: 250px; transition: 0.2s; }
-        .speak { background: #66BB6A; box-shadow: 0 8px 0 #388E3C; } /* 읽어주기: 초록 */
-        .delete { background: #EF5350; box-shadow: 0 8px 0 #C62828; } /* 지우기: 빨강 */
-        .reset { background: #BDBDBD; box-shadow: 0 8px 0 #757575; } /* 전체삭제: 회색 */
+        .control { padding: 25px 40px; font-size: 28px; font-weight: bold; border-radius: 30px; border: none; cursor: pointer; color: white; flex: 1; max-width: 250px; }
+        .speak { background: #66BB6A; box-shadow: 0 8px 0 #388E3C; } 
+        .delete { background: #EF5350; box-shadow: 0 8px 0 #C62828; } 
+        .reset { background: #BDBDBD; box-shadow: 0 8px 0 #757575; }
     </style>
 </head>
 <body>
@@ -70,7 +60,7 @@
     </div>
 
     <div class="control-panel">
-        <button class="control speak" onclick="speak()">또박또박 읽기</button>
+        <button class="control speak" onclick="speak()">읽기</button>
         <button class="control delete" onclick="del()">하나 지우기</button>
         <button class="control reset" onclick="reset()">전체 지우기</button>
     </div>
@@ -85,7 +75,7 @@
             update();
         }
         function del() {
-            chars.pop(); // 한 단계씩 지우기 기능
+            chars.pop();
             update();
         }
         function reset() {
@@ -93,18 +83,34 @@
             display.innerText = "어진반 글자놀이";
         }
         function update() {
+            // 한글 조합 라이브러리를 통해 완성형 글자로 변환
             const result = Hangul.assemble(chars);
             display.innerText = result || "어진반 글자놀이";
         }
         function speak() {
             const text = display.innerText;
             if(!text || text === "어진반 글자놀이") return;
+            
+            window.speechSynthesis.cancel(); 
+            
+            // 한글 조합이 미완성(예: 'ㄱ')인 경우에도 글자 자체의 소리를 읽도록 설정
             const msg = new SpeechSynthesisUtterance(text);
             msg.lang = 'ko-KR';
-            msg.rate = 0.6; // 명확한 발음을 위해 천천히 읽기
-            msg.pitch = 1.2; // 유아들이 좋아하는 밝은 톤
+            
+            // 전자칠판 환경에서 더 또박또박 들리도록 속도와 피치 최적화
+            msg.rate = 0.55; 
+            msg.pitch = 1.0; 
+            
+            // 한국어 전용 목소리 강제 지정 시도
+            const voices = window.speechSynthesis.getVoices();
+            const koVoice = voices.find(v => v.lang === 'ko-KR' || v.lang === 'ko_KR');
+            if (koVoice) msg.voice = koVoice;
+            
             window.speechSynthesis.speak(msg);
         }
+        
+        // 브라우저 음성 엔진 미리 로드 (TV 환경 대응)
+        window.speechSynthesis.getVoices();
     </script>
 </body>
 </html>
