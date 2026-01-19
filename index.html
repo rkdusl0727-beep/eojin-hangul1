@@ -3,34 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>어진반 한글 조합 놀이</title>
+    <title>어진반 한글 놀이터</title>
     <script src="https://unpkg.com/hangul-js"></script>
     <style>
-        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; text-align: center; background-color: #FFF9E1; margin: 0; padding: 20px; touch-action: manipulation; overflow-x: hidden; }
-        #display { font-size: 70px; min-height: 100px; background: white; border-radius: 30px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 8px 0 #FFD700; border: 5px solid #FFCC00; padding: 10px; color: #333; }
-        .section-title { font-size: 18px; font-weight: bold; color: #555; margin-bottom: 5px; text-align: left; padding-left: 10px; }
-        .group { margin-bottom: 20px; padding: 15px; background: white; border-radius: 20px; box-shadow: 0 4px 0 #ddd; }
-        .btn { display: inline-block; width: 55px; height: 55px; line-height: 55px; margin: 4px; font-size: 22px; font-weight: bold; background: #fff; border: 3px solid #eee; border-radius: 15px; cursor: pointer; transition: 0.1s; user-select: none; box-shadow: 0 4px 0 #eee; }
-        .btn:active { transform: translateY(4px); box-shadow: none; }
-        /* 자음: 파랑 계열 */
-        .consonant { border-color: #A2D2FF; color: #0077B6; box-shadow: 0 4px 0 #A2D2FF; }
-        /* 모음: 주황 계열 */
-        .vowel { border-color: #FFB085; color: #D35400; box-shadow: 0 4px 0 #FFB085; }
-        /* 쌍자음/겹받침: 보라 계열 */
-        .double { border-color: #CDB4DB; color: #6A4C93; box-shadow: 0 4px 0 #CDB4DB; font-size: 18px; }
-        /* 기능 버튼 */
-        .control-panel { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
-        .control { padding: 15px 25px; font-size: 20px; font-weight: bold; border-radius: 20px; border: none; cursor: pointer; color: white; flex: 1; max-width: 150px; }
-        .speak { background: #4CAF50; box-shadow: 0 5px 0 #388E3C; }
-        .delete { background: #FF5252; box-shadow: 0 5px 0 #D32F2F; }
-        .reset { background: #9E9E9E; box-shadow: 0 5px 0 #616161; }
+        /* 유아들이 좋아하는 밝고 따뜻한 색감 적용 */
+        body { font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; text-align: center; background-color: #FFFDE7; margin: 0; padding: 20px; touch-action: manipulation; }
+        
+        /* 전자칠판에서도 잘 보이도록 크고 선명한 전광판 */
+        #display { font-size: 100px; min-height: 150px; background: white; border-radius: 40px; display: flex; align-items: center; justify-content: center; margin-bottom: 30px; box-shadow: 0 10px 0 #FFD54F; border: 6px solid #FFC107; padding: 20px; color: #333; font-weight: bold; }
+        
+        .section-label { font-size: 22px; font-weight: bold; color: #555; margin-bottom: 10px; text-align: left; padding-left: 15px; }
+        .group { margin-bottom: 25px; padding: 20px; background: rgba(255,255,255,0.8); border-radius: 30px; box-shadow: 0 5px 0 #eee; }
+        
+        /* 터치하기 편한 큼직한 버튼 디자인 */
+        .btn { display: inline-block; width: 80px; height: 80px; line-height: 80px; margin: 6px; font-size: 32px; font-weight: bold; background: #fff; border: 4px solid #eee; border-radius: 20px; cursor: pointer; transition: 0.1s; user-select: none; box-shadow: 0 6px 0 #eee; }
+        .btn:active { transform: translateY(6px); box-shadow: none; }
+        
+        /* 가독성을 높이기 위한 영역별 색상 구분 */
+        .consonant { border-color: #64B5F6; color: #1976D2; box-shadow: 0 6px 0 #64B5F6; } /* 자음: 시원한 파랑 */
+        .vowel { border-color: #FF8A65; color: #E64A19; box-shadow: 0 6px 0 #FF8A65; } /* 모음: 따뜻한 주황 */
+        .double { border-color: #BA68C8; color: #7B1FA2; box-shadow: 0 6px 0 #BA68C8; } /* 쌍자음/겹받침: 예쁜 보라 */
+        
+        /* 기능 버튼: 크고 명확하게 */
+        .control-panel { display: flex; justify-content: center; gap: 20px; margin-top: 20px; }
+        .control { padding: 25px 40px; font-size: 28px; font-weight: bold; border-radius: 30px; border: none; cursor: pointer; color: white; flex: 1; max-width: 250px; transition: 0.2s; }
+        .speak { background: #66BB6A; box-shadow: 0 8px 0 #388E3C; } /* 읽어주기: 초록 */
+        .delete { background: #EF5350; box-shadow: 0 8px 0 #C62828; } /* 지우기: 빨강 */
+        .reset { background: #BDBDBD; box-shadow: 0 8px 0 #757575; } /* 전체삭제: 회색 */
     </style>
 </head>
 <body>
     <div id="display">어진반 글자놀이</div>
 
     <div class="group">
-        <div class="section-title">자음과 쌍자음</div>
+        <div class="section-label">🌟 자음과 쌍자음</div>
         <div class="btn consonant" onclick="add('ㄱ')">ㄱ</div><div class="btn consonant" onclick="add('ㄴ')">ㄴ</div>
         <div class="btn consonant" onclick="add('ㄷ')">ㄷ</div><div class="btn consonant" onclick="add('ㄹ')">ㄹ</div>
         <div class="btn consonant" onclick="add('ㅁ')">ㅁ</div><div class="btn consonant" onclick="add('ㅂ')">ㅂ</div>
@@ -44,19 +50,17 @@
     </div>
 
     <div class="group">
-        <div class="section-title">모음</div>
+        <div class="section-label">🌈 모음</div>
         <div class="btn vowel" onclick="add('ㅏ')">ㅏ</div><div class="btn vowel" onclick="add('ㅑ')">ㅑ</div>
         <div class="btn vowel" onclick="add('ㅓ')">ㅓ</div><div class="btn vowel" onclick="add('ㅕ')">ㅕ</div>
         <div class="btn vowel" onclick="add('ㅗ')">ㅗ</div><div class="btn vowel" onclick="add('ㅛ')">ㅛ</div>
         <div class="btn vowel" onclick="add('ㅜ')">ㅜ</div><div class="btn vowel" onclick="add('ㅠ')">ㅠ</div>
         <div class="btn vowel" onclick="add('ㅡ')">ㅡ</div><div class="btn vowel" onclick="add('ㅣ')">ㅣ</div>
         <div class="btn vowel" onclick="add('ㅐ')">ㅐ</div><div class="btn vowel" onclick="add('ㅔ')">ㅔ</div>
-        <div class="btn vowel" onclick="add('ㅘ')">ㅘ</div><div class="btn vowel" onclick="add('ㅝ')">ㅝ</div>
-        <div class="btn vowel" onclick="add('ㅟ')">ㅟ</div><div class="btn vowel" onclick="add('ㅢ')">ㅢ</div>
     </div>
 
     <div class="group">
-        <div class="section-title">겹받침</div>
+        <div class="section-label">💎 겹받침</div>
         <div class="btn double" onclick="add('ㄳ')">ㄳ</div><div class="btn double" onclick="add('ㄵ')">ㄵ</div>
         <div class="btn double" onclick="add('ㄶ')">ㄶ</div><div class="btn double" onclick="add('ㄺ')">ㄺ</div>
         <div class="btn double" onclick="add('ㄻ')">ㄻ</div><div class="btn double" onclick="add('ㄼ')">ㄼ</div>
@@ -66,9 +70,9 @@
     </div>
 
     <div class="control-panel">
-        <button class="control speak" onclick="speak()">읽어주기</button>
-        <button class="control delete" onclick="del()">지우기</button>
-        <button class="control reset" onclick="reset()">처음부터</button>
+        <button class="control speak" onclick="speak()">또박또박 읽기</button>
+        <button class="control delete" onclick="del()">하나 지우기</button>
+        <button class="control reset" onclick="reset()">전체 지우기</button>
     </div>
 
     <script>
@@ -81,7 +85,7 @@
             update();
         }
         function del() {
-            chars.pop();
+            chars.pop(); // 한 단계씩 지우기 기능
             update();
         }
         function reset() {
@@ -97,7 +101,8 @@
             if(!text || text === "어진반 글자놀이") return;
             const msg = new SpeechSynthesisUtterance(text);
             msg.lang = 'ko-KR';
-            msg.rate = 0.7; // 유아들이 듣기 편한 속도
+            msg.rate = 0.6; // 명확한 발음을 위해 천천히 읽기
+            msg.pitch = 1.2; // 유아들이 좋아하는 밝은 톤
             window.speechSynthesis.speak(msg);
         }
     </script>
